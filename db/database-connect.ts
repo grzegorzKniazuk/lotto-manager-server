@@ -1,0 +1,3 @@
+import mysql = require('mysql');
+
+
