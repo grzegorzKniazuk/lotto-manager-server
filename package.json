@@ -7,17 +7,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
     "start:debug": "nodemon --config nodemon-debug.json",
-    "prestart:prod": "rimraf dist && npm run build",
     "start:prod": "node dist/main.js",
-    "lint": "tslint -p tsconfig.json -c tslint.json",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "webpack": "webpack --config webpack.config.js"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.0",
@@ -45,11 +39,15 @@
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
     "ts-jest": "24.0.2",
+    "ts-loader": "^6.0.1",
     "ts-node": "8.1.0",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
     "typescript": "3.4.3",
-    "wait-on": "^3.2.0"
+    "wait-on": "^3.2.0",
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2",
+    "webpack-node-externals": "^1.7.2"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -6,12 +6,12 @@ export class User {
 	@PrimaryGeneratedColumn()
 	public id: number;
 
-	@Column('date')
-	public date: Date;
+	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+	public date: string;
 
-	@Column({ name: 'username', length: 45, nullable: false })
+	@Column('varchar', { length: 45 })
 	public username: string;
 
-	@Column({ name: 'password', length: 45, nullable: false })
+	@Column('varchar', { length: 45 })
 	public password: string;
 }

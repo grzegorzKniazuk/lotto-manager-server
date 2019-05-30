@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { Observable } from 'rxjs';
+import { User } from './user.entity';
+import { InsertResult, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
 
-	constructor(@InjectRepository(User) private usersRepository: Repository<User>) {
+	constructor(
+		@InjectRepository(User) private usersRepository: Repository<User>,
+		) {
 	}
 
 	public async getUsers(user: User): Promise<User[]> {
@@ -22,8 +22,8 @@ export class UsersService {
 		});
 	}
 
-	public createUser(user: User): Observable<User> {
-		return fromPromise(this.usersRepository.save(user));
+	public async createUser(user: User): Promise<InsertResult> {
+		return await this.usersRepository.insert(user);
 	}
 
 	public async updateUser(user: User) {

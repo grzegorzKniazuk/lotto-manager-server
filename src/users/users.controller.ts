@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/user.entity';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -14,11 +14,14 @@ export class UsersController {
 		return this.usersService.getUser(params.id);
 	}
 
+	@Get()
+	findAll() {
+		return 'This route uses a wildcard';
+	}
+
 	@Post()
-	public create(@Body() user: User): void {
-		this.usersService.createUser(user).subscribe((r) => {
-			console.log(r);
-		});
+	public create(@Body()user: User) {
+		return this.usersService.createUser(user);
 	}
 
 	@Put()
