@@ -14,7 +14,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /.tsx?$/,
+                test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
             },
@@ -24,7 +24,7 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
-    plugins: [new webpack.HotModuleReplacementPlugin()],
+    plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/])],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'server.js',

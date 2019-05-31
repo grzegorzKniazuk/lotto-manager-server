@@ -1,36 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { InsertResult, Repository } from 'typeorm';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CreateUserDto } from 'src/shared/dto';
+import { DatabaseException } from 'src/shared/exception-handlers/database.exception';
+import { DatabaseError } from 'src/shared/interfaces/database-response';
 
 @Injectable()
 export class UsersService {
 
 	constructor(
 		@InjectRepository(User) private usersRepository: Repository<User>,
-		) {
+	) {
 	}
 
-	public async getUsers(user: User): Promise<User[]> {
-		return await this.usersRepository.find();
-	}
-
-	public async getUser(_id: number): Promise<User[]> {
-		return await this.usersRepository.find({
-			select: [ 'username' ],
-			where: [ { 'id': _id } ],
-		});
-	}
-
-	public async createUser(user: User): Promise<InsertResult> {
-		return await this.usersRepository.insert(user);
-	}
-
-	public async updateUser(user: User) {
-		this.usersRepository.save(user);
-	}
-
-	public async deleteUser(user: User) {
-		this.usersRepository.delete(user);
+	public createUser(createUserDto: CreateUserDto): Observable<InsertResult> {
+		return fromPromise(this.usersRepository.insert(createUserDto))
+			.pipe(catchError((e: DatabaseError) => {
+				throw new DatabaseException({
+					code: e.code,
+					message: e.message,
+				}, HttpStatus.CONFLICT);
+			}));
 	}
 }

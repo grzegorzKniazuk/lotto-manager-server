@@ -9,9 +9,9 @@ export class User {
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
 	public date: string;
 
-	@Column('varchar', { length: 45 })
+	@Column('varchar', { length: 45, unique: true, nullable: false })
 	public username: string;
 
-	@Column('varchar', { length: 45 })
+	@Column('varchar', { length: 45, nullable: false })
 	public password: string;
 }

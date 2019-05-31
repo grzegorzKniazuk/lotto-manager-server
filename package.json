@@ -11,6 +11,7 @@
     "start:debug": "nodemon --config nodemon-debug.json",
     "start:prod": "node dist/main.js",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:hmr": "node dist/server",
     "webpack": "webpack --config webpack.config.js"
   },
   "dependencies": {
@@ -34,7 +35,7 @@
     "@types/node": "^10.12.18",
     "@types/supertest": "^2.0.7",
     "concurrently": "^4.1.0",
-    "jest": "^23.6.0",
+    "jest": "^24.8.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
@@ -47,6 +48,7 @@
     "wait-on": "^3.2.0",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.5.0",
     "webpack-node-externals": "^1.7.2"
   },
   "jest": {
