@@ -1,6 +1,6 @@
 import { Body, Controller, ForbiddenException, HttpCode, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from 'src/modules/auth/auth.service';
-import { UserService } from 'src/modules/users/user.service';
+import { UserService } from 'src/modules/user/user.service';
 import { AuthorizeUserDto, LoginUserDto, RegisterUserDto } from 'src/shared/data-transfer-objects';
 import { InsertResult } from 'typeorm';
 

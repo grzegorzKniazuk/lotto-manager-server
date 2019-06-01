@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { UserService } from 'src/modules/users/user.service';
+import { UserService } from 'src/modules/user/user.service';
 import { secret } from 'src/shared/constants';
 
 @Injectable()
