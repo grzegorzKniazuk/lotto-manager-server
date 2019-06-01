@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from 'src/modules/users/user.module';
+import { AuthModule } from 'src/modules/auth/auth.module';
 
 @Module({
 	imports: [
-		TypeOrmModule.forRoot({
-			keepConnectionAlive: true,
-		}),
-		UsersModule,
+		TypeOrmModule.forRoot(),
+		UserModule,
+		AuthModule,
 	],
 	controllers: [
 		AppController,
