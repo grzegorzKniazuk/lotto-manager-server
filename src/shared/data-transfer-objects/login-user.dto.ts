@@ -9,6 +9,6 @@ export class LoginUserDto {
 
 	@IsString()
 	@MinLength(1)
-	@MaxLength(45)
+	@MaxLength(60)
 	public readonly password: string;
 }

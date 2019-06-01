@@ -1,7 +1,7 @@
-import { Body, Controller, ForbiddenException, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { UserService } from 'src/modules/users/user.service';
-import { LoginUserDto, RegisterUserDto } from 'src/shared/data-transfer-objects';
+import { AuthorizeUserDto, LoginUserDto, RegisterUserDto } from 'src/shared/data-transfer-objects';
 import { InsertResult } from 'typeorm';
 
 @Controller('auth')
@@ -34,5 +34,15 @@ export class AuthController {
 	@HttpCode(201)
 	public async register(@Body()registerUserDto: RegisterUserDto): Promise<InsertResult> {
 		return await this.userService.register(registerUserDto);
+	}
+
+	@Post('authorize')
+	@HttpCode(200)
+	public async authorize(@Body()authorizeUserDto: AuthorizeUserDto): Promise<boolean> {
+		try {
+			return await this.userService.authorize(authorizeUserDto.token);
+		} catch (e) {
+			throw new UnauthorizedException('Nie masz dostępu do tego zasobu');
+		}
 	}
 }

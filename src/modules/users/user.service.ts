@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { RegisterUserDto } from 'src/shared/data-transfer-objects';
 import { DatabaseException } from 'src/shared/exception-handlers/database.exception';
-import { DatabaseErrorMessages } from 'src/shared/constants';
-import * as bcrypt from 'bcrypt';
+import { DatabaseErrorMessages, secret } from 'src/shared/constants';
 import { User } from 'src/shared/entities';
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UserService {
@@ -29,6 +30,17 @@ export class UserService {
 				message: DatabaseErrorMessages[e.code] || e.message,
 			}, HttpStatus.CONFLICT);
 		}
+	}
+
+	public async authorize(token: string): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			const verify = jwt.verify(token, secret);
+			if (verify) {
+				resolve(true);
+			} else {
+				reject(false);
+			}
+		});
 	}
 
 	public async getUserByUsername(username: string): Promise<User> {
