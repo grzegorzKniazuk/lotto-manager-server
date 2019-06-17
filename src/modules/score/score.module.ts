@@ -1,8 +1,8 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { ScoreController } from './score.controller';
-import { ScoreService } from './score.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Score } from 'src/shared/entities';
+import { Score } from './score.entity';
+import { ScoreService } from './score.service';
 
 @Module({
 	imports: [

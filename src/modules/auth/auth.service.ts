@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { DatabaseErrorMessages, secret } from 'src/shared/constants';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/shared/entities';
+import { DatabaseErrorMessages, secret } from '../../shared/constants';
 import { InsertResult, Repository } from 'typeorm';
-import { RegisterUserDto } from 'src/shared/data-transfer-objects';
-import { DatabaseException } from 'src/shared/exception-handlers/database.exception';
 import * as bcrypt from 'bcrypt';
+import { User } from './user.entity';
+import { RegisterUserDto } from '../../shared/data-transfer-objects';
+import { DatabaseException } from '../../shared/exception-handlers/database.exception';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {

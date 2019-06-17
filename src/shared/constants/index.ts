@@ -1,2 +1,2 @@
-export * from 'src/shared/constants/database-error-messages';
+export * from './database-error-messages';
 export * from './secret';

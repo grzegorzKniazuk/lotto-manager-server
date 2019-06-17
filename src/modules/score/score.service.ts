@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Score } from 'src/shared/entities';
 import { Repository } from 'typeorm';
-import { DatabaseException } from 'src/shared/exception-handlers/database.exception';
-import { DatabaseErrorMessages } from 'src/shared/constants';
+import { Score } from './score.entity';
+import { DatabaseErrorMessages } from '../../shared/constants';
+import { DatabaseException } from '../../shared/exception-handlers/database.exception';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ScoreService {
@@ -24,7 +24,6 @@ export class ScoreService {
 			});
 
 		} catch (e) {
-			console.log(e.code);
 			throw new DatabaseException({
 				code: e.code,
 				message: DatabaseErrorMessages[e.code] || e.message,

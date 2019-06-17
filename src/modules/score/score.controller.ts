@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode } from '@nestjs/common';
-import { ScoreService } from 'src/modules/score/score.service';
-import { Score } from 'src/shared/entities';
+import { ScoreService } from './score.service';
+import { Score } from './score.entity';
 
 @Controller('scores')
 export class ScoreController {

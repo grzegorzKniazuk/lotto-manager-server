@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from 'fs';
 
 const htmlFile = fs.readFileSync('html.html').toString('utf8');
 
