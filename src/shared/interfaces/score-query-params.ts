@@ -1,5 +1,5 @@
-
 export interface ScoreQueryParams {
-	startDate: string;
-	endDate: string;
+	startDate?: string;
+	endDate?: string;
+	indexes?: number[];
 }

@@ -1,7 +1,7 @@
-import { Controller, Get, HttpCode, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
 import { ScoreService } from './score.service';
 import { Score } from './score.entity';
-import { ScoreQueryParams } from '../../shared/interfaces/score-query-params';
+import { ScoreQueryParams } from '../../shared/interfaces';
 
 @Controller('scores')
 export class ScoreController {
@@ -13,7 +13,13 @@ export class ScoreController {
 
 	@Get()
 	@HttpCode(200)
-	public async scores(@Query() queryParams: ScoreQueryParams): Promise<Score[]> {
-		return await this.scoreService.scores(queryParams);
+	public async scores(): Promise<Score[]> {
+		return await this.scoreService.scores();
+	}
+
+	@Post('sum')
+	@HttpCode(200)
+	public async sumScoresNumbers(@Body() queryParams: ScoreQueryParams): Promise<[string, number][]> {
+		return await this.scoreService.sumScoresNumbers(queryParams);
 	}
 }
