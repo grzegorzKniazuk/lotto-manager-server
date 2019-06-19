@@ -11,9 +11,9 @@ import { BaseScoreService } from '../../shared/services';
 export class ScoreService extends BaseScoreService {
 
 	constructor(
-		@InjectRepository(ScoreEntity) private readonly scoreRepository: Repository<ScoreEntity>,
+		@InjectRepository(ScoreEntity) scoreRepository: Repository<ScoreEntity>,
 	) {
-		super();
+		super(scoreRepository);
 	}
 
 	public async scores(): Promise<Score[]> {
@@ -24,19 +24,11 @@ export class ScoreService extends BaseScoreService {
 		}
 	}
 
-	public async sumScoresNumbers(queryParams: ScoreQueryParams): Promise<DateValueArray> {
-		const { startDate, endDate, indexes } = this.prepareScoreQueryParams(queryParams);
-
+	public async sumScoresNumbers(queryParams: Partial<ScoreQueryParams>): Promise<DateValueArray> {
 		try {
-			const scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE, [ startDate, endDate ]));
-
-			const filteredScores = this.filterScoresNumbersArrayByIndex(scores, indexes);
-
-			return this.toDateValueArray(filteredScores, ScoreNumbersExpression.SUM);
-
+			return await this.queryToDateValueArray(queryParams)(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE)(ScoreNumbersExpression.SUM);
 		} catch (e) {
 			this.catchDatabaseException(e);
 		}
-
 	}
 }
