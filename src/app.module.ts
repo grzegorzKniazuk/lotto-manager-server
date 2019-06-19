@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { ScoreModule } from './modules/score/score.module';
-import { TimeService } from './shared/services/time.service';
+import { TimeService } from './shared/services';
 
 @Module({
 	imports: [
@@ -12,7 +12,7 @@ import { TimeService } from './shared/services/time.service';
 	],
 	providers: [
 		TimeService,
-	]
+	],
 })
 export class AppModule {
 }
