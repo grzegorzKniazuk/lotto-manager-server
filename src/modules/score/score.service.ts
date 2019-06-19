@@ -1,39 +1,26 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Score } from './score.entity';
-import { DatabaseErrorMessages } from '../../shared/constants';
-import { DatabaseException } from '../../shared/exception-handlers/database.exception';
+import { ScoreEntity } from './score.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ScoreQueryParams } from '../../shared/interfaces';
+import { Score, ScoreQueryParams } from '../../shared/interfaces';
 import { DateValueArray } from '../../shared/types';
-import { ScoreNumbersExpression } from '../../shared/enums';
-import { forEach } from 'lodash';
+import { ScoreNumbersExpression, SqlQuery } from '../../shared/enums';
 import { BaseScoreService } from '../../shared/services';
 
 @Injectable()
 export class ScoreService extends BaseScoreService {
 
 	constructor(
-		@InjectRepository(Score) private readonly scoreRepository: Repository<Score>,
+		@InjectRepository(ScoreEntity) private readonly scoreRepository: Repository<ScoreEntity>,
 	) {
 		super();
 	}
 
 	public async scores(): Promise<Score[]> {
 		try {
-			const scores = await this.scoreRepository.find();
-
-			return scores.map((score: Score) => {
-				score.numbers = (score.numbers as string).split(',').map((number: string) => +number);
-
-				return score;
-			});
-
+			return this.parseScoresRowDataPackets(await this.scoreRepository.find());
 		} catch (e) {
-			throw new DatabaseException({
-				code: e.code,
-				message: DatabaseErrorMessages[e.code] || e.message,
-			}, HttpStatus.INTERNAL_SERVER_ERROR);
+			this.catchDatabaseException(e);
 		}
 	}
 
@@ -41,20 +28,14 @@ export class ScoreService extends BaseScoreService {
 		const { startDate, endDate, indexes } = this.prepareScoreQueryParams(queryParams);
 
 		try {
-			const scores = await this.scoreRepository.query(`SELECT date, numbers FROM score WHERE date >= ? AND date <= ?`, [ startDate, endDate ]);
-			forEach(scores, (score: { date: string, numbers: string | number[] }) => {
-				score.numbers = (score.numbers as string).split(',').map((x: string) => +x);
-			});
+			const scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE, [ startDate, endDate ]));
 
 			const filteredScores = this.filterScoresNumbersArrayByIndex(scores, indexes);
 
 			return this.toDateValueArray(filteredScores, ScoreNumbersExpression.SUM);
 
 		} catch (e) {
-			throw new DatabaseException({
-				code: e.code,
-				message: DatabaseErrorMessages[e.code] || e.message,
-			}, HttpStatus.INTERNAL_SERVER_ERROR);
+			this.catchDatabaseException(e);
 		}
 
 	}

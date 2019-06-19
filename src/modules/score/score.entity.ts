@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Score {
+export class ScoreEntity {
 
 	@PrimaryGeneratedColumn()
 	public id: number;
@@ -10,7 +10,7 @@ export class Score {
 	public date: string;
 
 	@Column('varchar')
-	public numbers: string | number[];
+	public numbers: string;
 
 	@Column('int')
 	public bonus_number: number;
