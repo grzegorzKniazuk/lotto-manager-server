@@ -24,9 +24,9 @@ export class ScoreService extends BaseScoreService {
 		}
 	}
 
-	public async sumScoresNumbers(queryParams: Partial<ScoreQueryParams>): Promise<DateValueArray> {
+	public async scoresNumbersByQueryParams(queryParams: Partial<ScoreQueryParams>, expression: ScoreNumbersExpression): Promise<DateValueArray> {
 		try {
-			return await this.queryToDateValueArray(queryParams)(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE)(ScoreNumbersExpression.SUM);
+			return await this.queryToDateValueArray(queryParams)(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE)(expression);
 		} catch (e) {
 			this.catchDatabaseException(e);
 		}
