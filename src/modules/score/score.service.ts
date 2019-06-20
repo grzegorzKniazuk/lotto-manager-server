@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { ScoreEntity } from './score.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,21 +34,32 @@ export class ScoreService {
 		}
 	}
 
+	private catchDatabaseException(e): never {
+		throw new DatabaseException({
+			code: e.code,
+			message: DatabaseErrorMessages[e.code] || e.message,
+		}, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 	private async resolveQuery(query: string, queryParams: ScoreQueryParams): Promise<DateValueArray | BallValuePercentageArray> {
 		const { startDate, endDate, indexes, filter, expression } = queryParams;
+		const scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
+		const filteredScores = this.filterScoresNumbersArray(scores, indexes, filter);
 
-		let scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
-
-		scores = this.filterScoresNumbersArray(scores, indexes, filter);
-
-		if (queryParams.queryType === ScoreQueryType.DATE_VALUE) {
-			return this.toDateValueArray(scores, expression);
-		} else if (queryParams.queryType === ScoreQueryType.BALL_VALUE_PERCENTAGE) {
-			return await this.toBallValuePercentageArray(scores);
+		switch (queryParams.queryType) {
+			case ScoreQueryType.DATE_VALUE: {
+				return this.toDateValueArray(filteredScores, expression);
+			}
+			case ScoreQueryType.BALL_VALUE_PERCENTAGE: {
+				return await this.toBallValuePercentageArray(filteredScores);
+			}
+			default: {
+				throw new InternalServerErrorException('Niepoprawny parametr "queryType"');
+			}
 		}
 	}
 
-	private filterScoresNumbersArray(scores: Partial<Score[]>, index: number | number[], filter: ScoreNumbersFilter): Partial<Score[]> {
+	private filterScoresNumbersArray(scores: Partial<Score>[], index: number | number[], filter: ScoreNumbersFilter): Partial<Score>[] {
 		return map(scores, score => ({
 			...score,
 			numbers: isNumber(index)
@@ -69,13 +80,6 @@ export class ScoreService {
 		});
 
 		return scores;
-	}
-
-	private catchDatabaseException(e): never {
-		throw new DatabaseException({
-			code: e.code,
-			message: DatabaseErrorMessages[e.code] || e.message,
-		}, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	private prepareQuery(byField: QueryableScoreField): string {
