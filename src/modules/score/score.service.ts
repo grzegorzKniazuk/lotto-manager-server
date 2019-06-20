@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Score, ScoreQueryParams } from '../../shared/interfaces';
 import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
 import { TimeService } from '../../shared/services';
-import { QueryableScoreField, ScoreNumbersExpression, ScoreQueryType } from '../../shared/enums';
+import { QueryableScoreField, ScoreNumbersExpression, ScoreNumbersFilter, ScoreQueryType } from '../../shared/enums';
 import { DatabaseException } from '../../shared/exception-handlers/database.exception';
 import { DatabaseErrorMessages, FIRST_DRAW_DATE, ScoreNumbersExpressionsMap, ScoreNumbersFiltersMap } from '../../shared/constants';
 import { flatten, forEach, isNumber, map, mapValues } from 'lodash';
@@ -38,10 +38,8 @@ export class ScoreService {
 		const { startDate, endDate, indexes, filter, expression } = queryParams;
 
 		let scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
-		scores = this.filterScoresNumbersArrayByIndex(scores, indexes);
-		if (filter) {
-			scores = scores.filter(ScoreNumbersFiltersMap[filter]);
-		}
+
+		scores = this.filterScoresNumbersArray(scores, indexes, filter);
 
 		if (queryParams.queryType === ScoreQueryType.DATE_VALUE) {
 			return this.toDateValueArray(scores, expression);
@@ -50,13 +48,13 @@ export class ScoreService {
 		}
 	}
 
-	private filterScoresNumbersArrayByIndex(scores: Partial<Score[]>, index: number | number[]): Partial<Score[]> {
+	private filterScoresNumbersArray(scores: Partial<Score[]>, index: number | number[], filter: ScoreNumbersFilter): Partial<Score[]> {
 		return map(scores, score => ({
 			...score,
 			numbers: isNumber(index)
 				? [ score.numbers[index] ]
-				: score.numbers.filter((n: number, i: number) => index.includes(i)),
-		}));
+				: score.numbers.filter((_, i: number) => index.includes(i)),
+		})).filter(ScoreNumbersFiltersMap[filter] || (() => true));
 	}
 
 	private parseScoresRowDataPackets(scoresRdp: ScoreEntity[]): Score[] {
