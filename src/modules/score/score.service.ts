@@ -66,7 +66,7 @@ export class ScoreService {
 			scores.push({
 				...scoresRdp,
 				date: TimeService.formatDate(scoresRdp.date),
-				numbers: scoresRdp.numbers.split(',').map((number: string) => +number),
+				numbers: scoresRdp.numbers ? scoresRdp.numbers.split(',').map((number: string) => +number) : [ scoresRdp.bonus_number ],
 			});
 		});
 

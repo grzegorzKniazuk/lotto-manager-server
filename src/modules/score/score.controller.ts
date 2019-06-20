@@ -2,9 +2,6 @@ import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { ScoreService } from './score.service';
 import { Score, ScoreQueryParams } from '../../shared/interfaces';
 import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
-import { ScoreNumbersFilter, ScoreQueryType } from '../../shared/enums';
-
-type ScoreQuery = ScoreQueryType;
 
 @Controller('scores')
 export class ScoreController {
