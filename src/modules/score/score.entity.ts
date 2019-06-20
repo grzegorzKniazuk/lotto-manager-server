@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('score')
 export class ScoreEntity {
 
 	@PrimaryGeneratedColumn()
