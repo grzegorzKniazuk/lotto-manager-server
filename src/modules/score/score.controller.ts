@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { ScoreService } from './score.service';
-import { BallValuePercentage, Score, ScoreQueryParams } from '../../shared/interfaces';
-import { DateValueArray } from '../../shared/types';
+import { Score, ScoreQueryParams } from '../../shared/interfaces';
+import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
 import { ScoreNumbersExpression, ScoreNumbersFilters } from '../../shared/enums';
 
 @Controller('scores')
@@ -74,7 +74,61 @@ export class ScoreController {
 
 	@Post(ScoreNumbersFilters.NUMBERS_FREQUENCY)
 	@HttpCode(200)
-	public async numbersFrequency(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentage[]> {
+	public async numbersFrequency(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
 		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.NUMBERS_FREQUENCY);
+	}
+
+	@Post(ScoreNumbersFilters.SAME_WEEK_DAY_AS_TODAY)
+	@HttpCode(200)
+	public async sameWeekDayAsToday(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.SAME_WEEK_DAY_AS_TODAY);
+	}
+
+	@Post(ScoreNumbersFilters.SAME_MONTH_AS_TODAY)
+	@HttpCode(200)
+	public async sameMonthDayAsToday(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.SAME_MONTH_AS_TODAY);
+	}
+
+	@Post(ScoreNumbersFilters.ODD_DAY)
+	@HttpCode(200)
+	public async oddDay(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.ODD_DAY);
+	}
+
+	@Post(ScoreNumbersFilters.EVEN_DAY)
+	@HttpCode(200)
+	public async evenDay(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.EVEN_DAY);
+	}
+
+	@Post(ScoreNumbersFilters.ODD_MONTH)
+	@HttpCode(200)
+	public async oddMonth(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.ODD_MONTH);
+	}
+
+	@Post(ScoreNumbersFilters.EVEN_MONTH)
+	@HttpCode(200)
+	public async evenMonth(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.EVEN_MONTH);
+	}
+
+	@Post(ScoreNumbersFilters.SAME_YEAR_QUARTER)
+	@HttpCode(200)
+	public async sameYearDayQuarter(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.NUMBERS_FREQUENCY);
+	}
+
+	@Post(ScoreNumbersFilters.SAME_YEAR_DAY_NUMBER)
+	@HttpCode(200)
+	public async sameYearDayNumber(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.SAME_YEAR_DAY_NUMBER);
+	}
+
+	@Post(ScoreNumbersFilters.SAME_MONTH_DAY_NUMBER)
+	@HttpCode(200)
+	public async samMonthDayNumber(@Body() queryParams: ScoreQueryParams): Promise<BallValuePercentageArray> {
+		return await this.scoreService.scoresNumbersByFilters(queryParams, ScoreNumbersFilters.SAME_MONTH_DAY_NUMBER);
 	}
 }
