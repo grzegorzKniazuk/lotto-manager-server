@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { ScoreEntity } from './score.entity';
+import { EkstraPensjaEntity } from './ekstra-pensja.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Score, ScoreQueryParams } from '../../shared/interfaces';
 import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
@@ -11,10 +11,10 @@ import { DatabaseErrorMessages, FIRST_DRAW_DATE, ScoreNumbersExpressionsMap, Sco
 import { flatten, forEach, isNumber, map, mapValues } from 'lodash';
 
 @Injectable()
-export class ScoreService {
+export class EkstraPensjaService {
 
 	constructor(
-		@InjectRepository(ScoreEntity) private readonly scoreRepository: Repository<ScoreEntity>,
+		@InjectRepository(EkstraPensjaEntity) private readonly scoreRepository: Repository<EkstraPensjaEntity>,
 	) {
 	}
 
@@ -68,10 +68,10 @@ export class ScoreService {
 		})).filter(ScoreNumbersFiltersMap[filter] || (() => true));
 	}
 
-	private parseScoresRowDataPackets(scoresRdp: ScoreEntity[]): Score[] {
+	private parseScoresRowDataPackets(scoresRdp: EkstraPensjaEntity[]): Score[] {
 		const scores: Score[] = [];
 
-		forEach(scoresRdp, (scoresRdp: ScoreEntity) => {
+		forEach(scoresRdp, (scoresRdp: EkstraPensjaEntity) => {
 			scores.push({
 				...scoresRdp,
 				date: TimeService.formatDate(scoresRdp.date),

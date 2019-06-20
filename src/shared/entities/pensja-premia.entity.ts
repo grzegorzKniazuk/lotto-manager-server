@@ -1,8 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('score')
-export class ScoreEntity {
-
+export class PensjaPremiaEntity {
 	@PrimaryGeneratedColumn()
 	public id: number;
 

@@ -1,13 +1,13 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
-import { ScoreService } from './score.service';
+import { EkstraPensjaService } from './ekstra-pensja.service';
 import { Score, ScoreQueryParams } from '../../shared/interfaces';
 import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
 
-@Controller('scores')
-export class ScoreController {
+@Controller('ekstra_pensja')
+export class EkstraPensjaController {
 
 	constructor(
-		private readonly scoreService: ScoreService,
+		private readonly scoreService: EkstraPensjaService,
 	) {
 	}
 
