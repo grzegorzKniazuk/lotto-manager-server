@@ -5,10 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Score, ScoreQueryParams } from '../../shared/interfaces';
 import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
 import { TimeService } from '../../shared/services';
-import { ScoreNumbersExpression, ScoreNumbersFilters, SqlQuery } from '../../shared/enums';
+import { QueryableScoreField, ScoreNumbersExpression, ScoreQueryType } from '../../shared/enums';
 import { DatabaseException } from '../../shared/exception-handlers/database.exception';
 import { DatabaseErrorMessages, FIRST_DRAW_DATE, ScoreNumbersExpressionsMap, ScoreNumbersFiltersMap } from '../../shared/constants';
-import { filter, flatten, forEach, isNumber, map, mapValues } from 'lodash';
+import { flatten, forEach, isNumber, map, mapValues } from 'lodash';
 
 @Injectable()
 export class ScoreService {
@@ -26,19 +26,27 @@ export class ScoreService {
 		}
 	}
 
-	public async scoresNumbersByExpression(queryParams: Partial<ScoreQueryParams>, expression: ScoreNumbersExpression): Promise<DateValueArray> {
+	public async scoresByQueryParams(queryParams: ScoreQueryParams): Promise<any> {
 		try {
-			return await this.queryToDateValueArray(queryParams)(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE)(expression);
+			return await this.resolveQuery(this.prepareQuery(queryParams.byField), this.prepareScoreQueryParams(queryParams));
 		} catch (e) {
 			this.catchDatabaseException(e);
 		}
 	}
 
-	public async scoresNumbersByFilters(queryParams: Partial<ScoreQueryParams>, filter: ScoreNumbersFilters): Promise<BallValuePercentageArray> {
-		try {
-			return await this.queryToBallValuePercentageArray(queryParams)(SqlQuery.DATE_AND_NUMBERS_BY_DATE_RANGE)(filter);
-		} catch (e) {
-			this.catchDatabaseException(e);
+	private async resolveQuery(query: string, queryParams: ScoreQueryParams): Promise<DateValueArray | BallValuePercentageArray> {
+		const { startDate, endDate, indexes, filter, expression } = queryParams;
+
+		let scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
+		scores = this.filterScoresNumbersArrayByIndex(scores, indexes);
+		if (filter) {
+			scores = scores.filter(ScoreNumbersFiltersMap[filter]);
+		}
+
+		if (queryParams.queryType === ScoreQueryType.DATE_VALUE) {
+			return this.toDateValueArray(scores, expression);
+		} else if (queryParams.queryType === ScoreQueryType.BALL_VALUE_PERCENTAGE) {
+			return await this.toBallValuePercentageArray(scores);
 		}
 	}
 
@@ -51,7 +59,7 @@ export class ScoreService {
 		}));
 	}
 
-	protected parseScoresRowDataPackets(scoresRdp: ScoreEntity[]): Score[] {
+	private parseScoresRowDataPackets(scoresRdp: ScoreEntity[]): Score[] {
 		const scores: Score[] = [];
 
 		forEach(scoresRdp, (scoresRdp: ScoreEntity) => {
@@ -65,26 +73,33 @@ export class ScoreService {
 		return scores;
 	}
 
-	protected catchDatabaseException(e): never {
+	private catchDatabaseException(e): never {
 		throw new DatabaseException({
 			code: e.code,
 			message: DatabaseErrorMessages[e.code] || e.message,
 		}, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	protected prepareScoreQueryParams(queryParams: Partial<ScoreQueryParams>): ScoreQueryParams {
+	private prepareQuery(byField: QueryableScoreField): string {
+		return `SELECT date, ${byField} FROM score WHERE date >= ? AND date <= ?`;
+	}
+
+	private prepareScoreQueryParams(queryParams: Partial<ScoreQueryParams>): ScoreQueryParams {
 		const startDate = queryParams.startDate || FIRST_DRAW_DATE;
 		const endDate = queryParams.endDate || TimeService.currentDate;
-		const indexes = queryParams.indexes || [ 0, 1, 2, 3, 4 ];
 
 		return {
+			queryType: queryParams.queryType,
+			byField: queryParams.byField,
 			startDate,
 			endDate,
-			indexes,
+			indexes: queryParams.indexes,
+			filter: queryParams.filter,
+			expression: queryParams.expression,
 		};
 	}
 
-	protected toDateValueArray(scores: Partial<Score>[], expression: ScoreNumbersExpression): DateValueArray {
+	private toDateValueArray(scores: Partial<Score>[], expression: ScoreNumbersExpression): DateValueArray {
 		const dateValueArray: DateValueArray = [];
 
 		forEach(scores, (score: Score) => {
@@ -94,34 +109,8 @@ export class ScoreService {
 		return dateValueArray;
 	}
 
-	protected queryToDateValueArray(queryParams: Partial<ScoreQueryParams>): (query: SqlQuery) => (expression: ScoreNumbersExpression) => Promise<DateValueArray> {
-		return (query: SqlQuery): (expression: ScoreNumbersExpression) => Promise<DateValueArray> => {
-			return async (expression: ScoreNumbersExpression): Promise<DateValueArray> => {
-				const { startDate, endDate, indexes } = this.prepareScoreQueryParams(queryParams);
-				const scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
-				const scoresFilteredByIndexes = this.filterScoresNumbersArrayByIndex(scores, indexes);
-
-				return this.toDateValueArray(scoresFilteredByIndexes, expression);
-			};
-		};
-	}
-
-	protected queryToBallValuePercentageArray(queryParams: Partial<ScoreQueryParams>): (query: SqlQuery) => (scoreFilter: ScoreNumbersFilters) => Promise<BallValuePercentageArray> {
-		return (query: SqlQuery): (scoreFilter: ScoreNumbersFilters) => Promise<BallValuePercentageArray> => {
-			return async (scoreFilter: ScoreNumbersFilters): Promise<BallValuePercentageArray> => {
-				const { startDate, endDate, indexes } = this.prepareScoreQueryParams(queryParams);
-				const scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
-				const scoresFilteredByIndexes = this.filterScoresNumbersArrayByIndex(scores, indexes);
-
-				return this.toBallValuePercentageArray(scoresFilteredByIndexes, scoreFilter);
-			};
-		};
-	}
-
-	private toBallValuePercentageArray(scores: Partial<Score>[], scoreFilter: ScoreNumbersFilters): BallValuePercentageArray {
-		const filteredScores = filter(scores, ScoreNumbersFiltersMap[scoreFilter]);
-
-		const flatScoresNumbers = this.scoresNumbersArraysToFlatNumbersArray(filteredScores);
+	private toBallValuePercentageArray(scores: Partial<Score>[]): BallValuePercentageArray {
+		const flatScoresNumbers = this.scoresNumbersArraysToFlatNumbersArray(scores);
 
 		return this.mapNumbersArrayToBallValuePercentage(flatScoresNumbers);
 	}

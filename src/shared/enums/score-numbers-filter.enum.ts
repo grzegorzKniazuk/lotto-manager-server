@@ -1,4 +1,4 @@
-export enum ScoreNumbersFilters {
+export enum ScoreNumbersFilter {
 	NUMBERS_FREQUENCY = 'numbers-frequency',
 	SAME_WEEK_DAY_AS_TODAY = 'same-week-day-as-today',
 	SAME_MONTH_AS_TODAY = 'same-month-as-today',
