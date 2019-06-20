@@ -14,19 +14,19 @@ import { flatten, forEach, isNumber, map, mapValues } from 'lodash';
 export class EkstraPensjaService {
 
 	constructor(
-		@InjectRepository(EkstraPensjaEntity) private readonly scoreRepository: Repository<EkstraPensjaEntity>,
+		@InjectRepository(EkstraPensjaEntity) private readonly ekstraPensjaRepository: Repository<EkstraPensjaEntity>,
 	) {
 	}
 
 	public async scores(): Promise<Score[]> {
 		try {
-			return this.parseScoresRowDataPackets(await this.scoreRepository.find());
+			return this.parseScoresRowDataPackets(await this.ekstraPensjaRepository.find());
 		} catch (e) {
 			this.catchDatabaseException(e);
 		}
 	}
 
-	public async scoresByQueryParams(queryParams: ScoreQueryParams): Promise<any> {
+	public async scoresByQueryParams(queryParams: ScoreQueryParams): Promise<DateValueArray | BallValuePercentageArray> {
 		try {
 			return await this.resolveQuery(this.prepareQuery(queryParams.byField), this.prepareScoreQueryParams(queryParams));
 		} catch (e) {
@@ -43,9 +43,9 @@ export class EkstraPensjaService {
 
 	private async resolveQuery(query: string, queryParams: ScoreQueryParams): Promise<DateValueArray | BallValuePercentageArray> {
 		const { startDate, endDate, indexes, filter, expression } = queryParams;
-		const scores = this.parseScoresRowDataPackets(await this.scoreRepository.query(query, [ startDate, endDate ]));
+		const scores = this.parseScoresRowDataPackets(await this.ekstraPensjaRepository.query(query, [ startDate, endDate ]));
 		const filteredScores = this.filterScoresNumbersArray(scores, indexes, filter);
-
+		console.log(scores);
 		switch (queryParams.queryType) {
 			case ScoreQueryType.DATE_VALUE: {
 				return this.toDateValueArray(filteredScores, expression);
@@ -83,7 +83,7 @@ export class EkstraPensjaService {
 	}
 
 	private prepareQuery(byField: QueryableScoreField): string {
-		return `SELECT date, ${byField} FROM score WHERE date >= ? AND date <= ?`;
+		return `SELECT date, ${byField} FROM ekstra_pensja WHERE date >= ? AND date <= ?`;
 	}
 
 	private prepareScoreQueryParams(queryParams: Partial<ScoreQueryParams>): ScoreQueryParams {

@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class EkstraPremiaService {
 	constructor(
-		@InjectRepository(EkstraPremiaEntity) private readonly scoreRepository: Repository<EkstraPremiaEntity>,
+		@InjectRepository(EkstraPremiaEntity) private readonly ekstraPremiaRepository: Repository<EkstraPremiaEntity>,
 	) {
 	}
 }

@@ -7,19 +7,19 @@ import { BallValuePercentageArray, DateValueArray } from '../../shared/types';
 export class EkstraPensjaController {
 
 	constructor(
-		private readonly scoreService: EkstraPensjaService,
+		private readonly ekstraPensjaService: EkstraPensjaService,
 	) {
 	}
 
 	@Get()
 	@HttpCode(200)
 	public async scores(): Promise<Score[]> {
-		return await this.scoreService.scores();
+		return await this.ekstraPensjaService.scores();
 	}
 
 	@Post('query')
 	@HttpCode(200)
 	public async scoresByQueryParams(@Body() queryParams: ScoreQueryParams): Promise<DateValueArray | BallValuePercentageArray> {
-		return await this.scoreService.scoresByQueryParams(queryParams);
+		return await this.ekstraPensjaService.scoresByQueryParams(queryParams);
 	}
 }
