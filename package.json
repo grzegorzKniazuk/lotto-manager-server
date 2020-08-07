@@ -22,7 +22,7 @@
     "@types/mathjs": "^5.0.1",
     "@types/ramda": "^0.26.9",
     "bcrypt": "^3.0.6",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.9.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
